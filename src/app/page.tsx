@@ -1,5 +1,11 @@
-const Page = () => {
-  return <div>Hello world</div>;
+import { prisma } from "@/lib/db";
+
+const Page = async () => {
+  return (
+    <>
+      <div>hello</div>
+    </>
+  );
 };
 
 export default Page;
