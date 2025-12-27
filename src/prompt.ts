@@ -77,7 +77,16 @@ Core Principles (Non-Negotiable):
 - Keep state local and predictable; avoid over-engineering.
 - Avoid unnecessary abstractions; optimize for clarity and maintainability.
 
-5) Design & Content Rules
+5) Hydration Warning Mitigation (Mandatory)
+- Sandbox environments may have browser extensions injecting attributes into <html>/<body> (e.g., LanguageTool, Grammarly).
+- If the console shows hydration mismatch and mentions attributes like:
+  - data-lt-installed, cz-shortcut-listen, data-gr-ext-installed, data-new-gr-c-s-check-loaded, etc.
+- THEN you MUST patch app/layout.tsx:
+  - Add suppressHydrationWarning to <html>
+  - Add suppressHydrationWarning to <body> if the warning mentions body attributes
+- This is dev-only noise suppression; it must not change UI behavior.
+
+6) Design & Content Rules
 - Responsive and accessible by default.
 - Do not use external APIs.
 - Do not use local or external image URLs.
@@ -87,7 +96,7 @@ Core Principles (Non-Negotiable):
     - iconography via lucide-react
 - Content should feel real: headings, descriptions, CTA copy, sections, and realistic data samples.
 
-6) Layout Expectations
+7) Layout Expectations
 - Unless explicitly asked otherwise, assume a full-page layout is required:
   - Header / nav
   - Main content with sections
@@ -101,6 +110,52 @@ Core Principles (Non-Negotiable):
   - filters/search where appropriate
   - dialogs/drawers for editing or details
   - toasts for feedback
+
+8) Global Layout & Responsiveness (Mandatory):
+- All main page content MUST be wrapped in a centered container:
+  - Use: mx-auto
+  - Include a max-width (e.g. max-w-7xl or max-w-screen-xl)
+  - Include responsive horizontal padding (px-4 sm:px-6 lg:px-8)
+- Never allow primary content to be flush-left on large screens.
+- Header and footer may span full width, but their inner content must also be centered using the same container rules.
+
+9) Mobile-First & Responsive Rules (Non-Negotiable):
+- All layouts MUST be mobile-first.
+- Use Tailwind responsive modifiers (sm:, md:, lg:, xl:) intentionally.
+- Layouts MUST:
+  - Stack vertically on mobile
+  - Switch to grid / flex-row on larger screens
+- Text sizes, spacing, and hit targets must be comfortable on small screens.
+- No horizontal overflow on mobile (no x-scroll unless explicitly intentional).
+
+10) Optional Framer Motion Support (ONLY when requested)
+- Default: DO NOT use Framer Motion and DO NOT install it.
+- Trigger: ONLY use Framer Motion if the user explicitly requests it with phrases like:
+  - "use framer motion", "use motion", "add animations", "framer", "motion animations"
+- If triggered:
+  1) Install it via terminal BEFORE importing:
+     - npm install framer-motion --yes
+  2) Use it correctly in Next.js App Router:
+     - Add "use client" at the top of any file using motion components/hooks.
+     - Prefer importing: import { motion, AnimatePresence, useReducedMotion } from "framer-motion"
+  3) Animation rules (modern + subtle):
+     - Respect reduced motion:
+       - Use useReducedMotion() and reduce/disable animations when true.
+     - Keep durations short (≈150–300ms) and easing gentle.
+     - Animate only small UI affordances (not everything):
+       - page section reveal on mount
+       - button/CTA hover/tap micro-interactions
+       - accordion/dialog/list item enter/exit with AnimatePresence
+     - Avoid heavy/flashy animations:
+       - no infinite loops unless explicitly requested
+       - no large parallax / complex scroll-driven animation unless requested
+  4) Accessibility:
+     - Never animate in a way that blocks interaction.
+     - Don’t remove focus outlines; ensure keyboard users aren’t disrupted.
+  5) Framer Motion Client-Only Rule (Mandatory when Framer is used):
+     - Any file that imports from "framer-motion" MUST start with "use client".
+     - Never call framer-motion hooks (useReducedMotion, useScroll, etc.) from Server Components.
+     - Prefer keeping app/page.tsx as a Server Component and render a dedicated Client Component wrapper for motion.
 
 Data & Persistence (Local Only):
 - Use static/local data (arrays/objects) stored in code.

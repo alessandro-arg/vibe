@@ -1,6 +1,11 @@
 import { Sandbox } from "@e2b/code-interpreter";
 
-import { openai, createAgent, createTool } from "@inngest/agent-kit";
+import {
+  openai,
+  createAgent,
+  createTool,
+  createNetwork,
+} from "@inngest/agent-kit";
 import { inngest } from "./client";
 import { getSandbox, lastAssistantTextMessageContent } from "./utils";
 import { z } from "zod";
@@ -17,10 +22,7 @@ export const helloWorld = inngest.createFunction(
 
     const codeAgent = createAgent({
       model: openai({
-        model: "gpt-5",
-        defaultParameters: {
-          temperature: 0.1,
-        },
+        model: "gpt-4.1",
       }),
       name: "code-agent",
       description: "An expert coding agent",
@@ -134,9 +136,22 @@ export const helloWorld = inngest.createFunction(
       },
     });
 
-    const { output } = await codeAgent.run(
-      `Write the following snippet: : ${event.data.value}`
-    );
+    const network = createNetwork({
+      name: "coding-agent-network",
+      agents: [codeAgent],
+      maxIter: 15,
+      router: async ({ network }) => {
+        const summary = network.state.data.summary;
+
+        if (summary) {
+          return;
+        }
+
+        return codeAgent;
+      },
+    });
+
+    const result = await network.run(event.data.value);
 
     const sandboxUrl = await step.run("get-sandbox-url", async () => {
       const sandbox = await getSandbox(sandboxId);
@@ -144,6 +159,11 @@ export const helloWorld = inngest.createFunction(
       return `https://${host}`;
     });
 
-    return { output, sandboxUrl };
+    return {
+      url: sandboxUrl,
+      title: "Fragment",
+      files: result.state.data.files,
+      summary: result.state.data.summary,
+    };
   }
 );
