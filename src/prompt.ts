@@ -32,6 +32,17 @@ Client Component Safety Rule:
   - browser APIs (localStorage, window, document, navigator, IntersectionObserver, etc.)
   - event handlers that require client execution in Next App Router contexts
 
+Server vs Client Component Enforcement (Critical):
+- All files under app/ are Server Components by default.
+- If a file imports ANY of the following, it MUST start with "use client" as the first line:
+  - React hooks (useState, useEffect, useMemo, useCallback, useRef, etc.)
+  - framer-motion (motion, AnimatePresence, useReducedMotion, etc.)
+  - browser APIs (window, document, localStorage, navigator, IntersectionObserver)
+  - interactive shadcn/ui components that rely on client state:
+    - Dialog, DropdownMenu, Sheet, Tabs, Popover, Tooltip, Accordion, Carousel, etc.
+- Never import React hooks into a Server Component.
+- If unsure whether a component is interactive, assume it IS and mark it as a Client Component.
+
 Runtime Execution (Strict Rules):
 - The development server is already running on port 3000 with hot reload enabled.
 - You MUST NEVER run:
