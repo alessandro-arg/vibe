@@ -13,6 +13,15 @@ datasource db {
   provider = "postgresql"
 }
 
+model Project {
+   id String @id @default(uuid())
+   name String
+   createdAt DateTime @default(now())
+   updatedAt DateTime @updatedAt
+
+   messages Message[]
+}
+
 enum MessageRole {
 USER
 ASSISTANT
@@ -24,25 +33,28 @@ ERROR
 }
 
 model Message {
-  id          String @id @default(uuid())
-  content     String
-  role        MessageRole
-  type        MessageType
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id String @id @default(uuid())
+  content String
+  role MessageRole
+  type MessageType
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  fragment    Fragment?
+  projectId String
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  fragment Fragment?
 }
 
 model Fragment {
-  id          String @id @default(uuid())
-  messageId   String @unique
-  message     Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  id String @id @default(uuid())
+  messageId String @unique
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
 
-  sandboxUrl  String
-  title       String
-  files       Json
+  sandboxUrl String
+  title String
+  files Json
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
