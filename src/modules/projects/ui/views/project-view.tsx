@@ -18,8 +18,9 @@ export const ProjectView = ({ projectId }: Props) => {
       <ResizablePanelGroup orientation="horizontal">
         <ResizablePanel
           defaultSize={35}
-          minSize={20}
-          className="flex flex-col min-h-0"
+          minSize={350}
+          maxSize={700}
+          className="flex flex-col min-h-0 min-w-87.5"
         >
           <Suspense fallback={<p>Loading messages...</p>}>
             <MessagesContainer projectId={projectId} />

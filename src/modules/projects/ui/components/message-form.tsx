@@ -8,8 +8,9 @@ import { Form, FormField } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { Button } from "@/components/ui/button";
-import { ArrowUpIcon } from "lucide-react";
+import { ArrowUpIcon, Loader2Icon } from "lucide-react";
 import { useTRPC } from "@/trpc/client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface Props {
   projectId: string;
@@ -23,10 +24,8 @@ const formSchema = z.object({
 });
 
 export const MessageForm = ({ projectId }: Props) => {
-  const [isFocused, setIsFocused] = useState(false);
-  const showUsage = false;
-
   const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -34,9 +33,31 @@ export const MessageForm = ({ projectId }: Props) => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+  const createMessage = useMutation(
+    trpc.messages.create.mutationOptions({
+      onSuccess: () => {
+        form.reset();
+        queryClient.invalidateQueries(
+          trpc.messages.getMany.queryOptions({ projectId })
+        );
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    })
+  );
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    await createMessage.mutateAsync({
+      value: values.value,
+      projectId,
+    });
   };
+
+  const [isFocused, setIsFocused] = useState(false);
+  const showUsage = false;
+  const isPending = createMessage.isPending;
+  const isDisabled = isPending || !form.formState.isValid;
 
   return (
     <Form {...form}>
@@ -53,6 +74,7 @@ export const MessageForm = ({ projectId }: Props) => {
           name="value"
           render={({ field }) => (
             <TextareaAutosize
+              disabled={isPending}
               {...field}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
@@ -82,8 +104,12 @@ export const MessageForm = ({ projectId }: Props) => {
             </KbdGroup>{" "}
             to submit
           </div>
-          <Button className={cn("size-8 rounded-full")}>
-            <ArrowUpIcon />
+          <Button disabled={isDisabled} className="size-8 rounded-full">
+            {isPending ? (
+              <Loader2Icon className="size-4 animate-spin" />
+            ) : (
+              <ArrowUpIcon />
+            )}
           </Button>
         </div>
       </form>
