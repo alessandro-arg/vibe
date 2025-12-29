@@ -1,5 +1,68 @@
+import { Card } from "@/components/ui/card";
 import { Fragment } from "@/generated/prisma/client";
 import { MessageRole, MessageType } from "@/generated/prisma/enums";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import Image from "next/image";
+
+interface UserMessageProps {
+  content: string;
+}
+
+const UserMessage = ({ content }: UserMessageProps) => {
+  return (
+    <div className="flex justify-end pb-4 pr-2 pl-10">
+      <Card className="rouded-lg bg-muted p-3 shadow-none border-none max-w-[80%] wrap-break-word">
+        {content}
+      </Card>
+    </div>
+  );
+};
+
+interface AssistantMessageProps {
+  content: string;
+  fragment: Fragment | null;
+  createdAt: Date;
+  isActiveFragment: boolean;
+  onFragmentClick: (fragment: Fragment) => void;
+  type: MessageType;
+}
+
+const AssistantMessage = ({
+  content,
+  fragment,
+  createdAt,
+  isActiveFragment,
+  onFragmentClick,
+  type,
+}: AssistantMessageProps) => {
+  return (
+    <div
+      className={cn(
+        "flex flex-col group px-2 pb-4",
+        type === "ERROR" && "text-red-700 dark:text-red-500"
+      )}
+    >
+      <div className="flex items-center gap-2 pl-2 mb-2">
+        <Image
+          src="/logo.svg"
+          alt="vibe logo"
+          width={18}
+          height={18}
+          className="shrink-0"
+        />
+        <span className="text-sm font-medium">Vibe</span>
+        <span className="text-xs text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+          {format(createdAt, "HH:mm',' dd MMM. yyyy")}
+        </span>
+      </div>
+
+      <div className="pl-8.5 flex flex-col gap-y-4 max-w-lg">
+        <span>{content}</span>
+      </div>
+    </div>
+  );
+};
 
 interface MessageCardProps {
   content: string;
@@ -10,6 +73,7 @@ interface MessageCardProps {
   onFragmentClick: (fragment: Fragment) => void;
   type: MessageType;
 }
+
 export const MessageCard = ({
   content,
   role,
@@ -20,8 +84,17 @@ export const MessageCard = ({
   type,
 }: MessageCardProps) => {
   if (role === "ASSISTANT") {
-    return <p>ASSISTANT</p>;
+    return (
+      <AssistantMessage
+        content={content}
+        fragment={fragment}
+        createdAt={createdAt}
+        isActiveFragment={isActiveFragment}
+        onFragmentClick={onFragmentClick}
+        type={type}
+      />
+    );
   }
 
-  return <p>USER</p>;
+  return <UserMessage content={content} />;
 };
