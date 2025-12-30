@@ -1,6 +1,7 @@
+import { Hint } from "@/components/hint";
 import { Button } from "@/components/ui/button";
 import { Fragment } from "@/generated/prisma/client";
-import { ExternalLinkIcon, RefreshCcwIcon } from "lucide-react";
+import { ArrowRight, ExternalLinkIcon, RefreshCcwIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -19,15 +20,15 @@ export function FragmentWeb({ data }: Props) {
   const handleCopy = () => {
     navigator.clipboard.writeText(data.sandboxUrl);
     setCopied(true);
-    toast("Copied to clipboard!", {
-      description: "Link copied successfully.",
+    toast("Copied to clipboard.", {
+      description: (
+        <div className="flex items-center gap-2">
+          <p>Open in a new tab</p>
+          <ArrowRight size={14} />
+        </div>
+      ),
       action: {
-        label: (
-          <span className="flex items-center gap-2 justify-center">
-            Navigate to the app
-            <ExternalLinkIcon size={14} />
-          </span>
-        ),
+        label: <ExternalLinkIcon size={14} className="p-0" />,
         onClick: () => {
           if (!data.sandboxUrl) return;
 
@@ -41,30 +42,36 @@ export function FragmentWeb({ data }: Props) {
   return (
     <div className="flex flex-col w-full h-full">
       <div className="p-2 border-b bg-sidebar flex items-center gap-x-2">
-        <Button size="sm" variant="outline" onClick={onRefresh}>
-          <RefreshCcwIcon />
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={handleCopy}
-          disabled={!data.sandboxUrl || copied}
-          className="flex-1 justify-start text-start font-normal"
-        >
-          <span className="truncate">{data.sandboxUrl}</span>
-        </Button>
-        <Button
-          size="sm"
-          disabled={!data.sandboxUrl}
-          variant="outline"
-          onClick={() => {
-            if (!data.sandboxUrl) return;
+        <Hint text="Refresh app">
+          <Button size="sm" variant="outline" onClick={onRefresh}>
+            <RefreshCcwIcon />
+          </Button>
+        </Hint>
+        <Hint text="Click to copy" side="bottom">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleCopy}
+            disabled={!data.sandboxUrl || copied}
+            className="flex-1 justify-start text-start font-normal"
+          >
+            <span className="truncate">{data.sandboxUrl}</span>
+          </Button>
+        </Hint>
+        <Hint text="Open in a new tab" side="bottom" align="start">
+          <Button
+            size="sm"
+            disabled={!data.sandboxUrl}
+            variant="outline"
+            onClick={() => {
+              if (!data.sandboxUrl) return;
 
-            window.open(data.sandboxUrl, "_blank");
-          }}
-        >
-          <ExternalLinkIcon />
-        </Button>
+              window.open(data.sandboxUrl, "_blank");
+            }}
+          >
+            <ExternalLinkIcon />
+          </Button>
+        </Hint>
       </div>
       <iframe
         key={fragmentKey}
