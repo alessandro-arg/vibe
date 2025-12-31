@@ -98,6 +98,7 @@ export const MessageForm = ({ projectId }: Props) => {
               <Kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
                 &#8984; + Enter
               </Kbd>
+              /
               <Kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
                 Ctrl + Enter
               </Kbd>
