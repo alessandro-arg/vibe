@@ -33,7 +33,7 @@ export const Navbar = () => {
           </div>
         </SignedOut>
         <SignedIn>
-          <UserControl />
+          <UserControl showName />
         </SignedIn>
       </div>
     </nav>

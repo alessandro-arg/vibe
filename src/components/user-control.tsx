@@ -13,7 +13,7 @@ export const UserControl = ({ showName }: Props) => {
 
   return (
     <UserButton
-      showName
+      showName={showName}
       appearance={{
         elements: {
           userButtonBox: "rounded-md!",
