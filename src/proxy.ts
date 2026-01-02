@@ -4,7 +4,14 @@ const isPublicRoute = createRouteMatcher([
   "/",
   "/sign-in(.*)",
   "/sign-up(.*)",
-  "/api(.*)",
+  "/api/inngest(.*)",
+  "/api/trpc(.*)",
+  "/manifest.json",
+  "/icon.png",
+  "/apple-icon.png",
+  "/web-app-manifest-192x192.png",
+  "/web-app-manifest-512x512.png",
+  "/favicon.ico",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
