@@ -77,7 +77,7 @@ export const ProjectView = ({ projectId }: Props) => {
                     </Link>
                   </Button>
                 )}
-                <UserControl />
+                <UserControl showName />
               </div>
             </div>
             <TabsContent value="preview">
