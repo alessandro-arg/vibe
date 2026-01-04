@@ -18,6 +18,7 @@ import { CodeView } from "@/components/code-view";
 import { FileExplorer } from "@/components/file-explorer";
 import { UserControl } from "@/components/user-control";
 import { useAuth } from "@clerk/nextjs";
+import { ErrorBoundary } from "react-error-boundary";
 
 interface Props {
   projectId: string;
@@ -39,16 +40,41 @@ export const ProjectView = ({ projectId }: Props) => {
           maxSize={700}
           className="flex flex-col min-h-0 min-w-87.5"
         >
-          <Suspense fallback={<p>Loading project...</p>}>
-            <ProjectHeader projectId={projectId} />
-          </Suspense>
-          <Suspense fallback={<p>Loading messages...</p>}>
-            <MessagesContainer
-              projectId={projectId}
-              activeFragment={activeFragment}
-              setActiveFragment={setActiveFragment}
-            />
-          </Suspense>
+          <ErrorBoundary
+            fallback={
+              <p className="font-mono pl-4 pt-4">
+                Sorry, we can't find the header.
+              </p>
+            }
+          >
+            <Suspense
+              fallback={
+                <p className="font-mono pl-4 pt-4">Loading project...</p>
+              }
+            >
+              <ProjectHeader projectId={projectId} />
+            </Suspense>
+          </ErrorBoundary>
+          <ErrorBoundary
+            fallback={
+              <p className="font-mono pl-4 pt-4">
+                Sorry, we can't find the messages. <br /> Try to refresh the
+                page
+              </p>
+            }
+          >
+            <Suspense
+              fallback={
+                <p className="font-mono pl-4 pt-4">Loading messages...</p>
+              }
+            >
+              <MessagesContainer
+                projectId={projectId}
+                activeFragment={activeFragment}
+                setActiveFragment={setActiveFragment}
+              />
+            </Suspense>
+          </ErrorBoundary>
         </ResizablePanel>
         <ResizableHandle className="hover:bg-primary transition-colors" />
         <ResizablePanel defaultSize={65} minSize={50}>
