@@ -6,12 +6,7 @@ import {
 } from "./ui/resizable";
 import { Hint } from "./hint";
 import { Button } from "./ui/button";
-import {
-  CheckCheckIcon,
-  ClipboardPasteIcon,
-  CopyCheckIcon,
-  CopyIcon,
-} from "lucide-react";
+import { CheckCheckIcon, ClipboardPasteIcon, CopyIcon } from "lucide-react";
 import { CodeView } from "./code-view";
 import { convertFilesToTreeItems } from "@/lib/utils";
 import { TreeView } from "./tree-view";
@@ -112,7 +107,7 @@ export const FileExplorer = ({ files }: FileExplorerProps) => {
         setSelectedFile(filePath);
       }
     },
-    [files]
+    [files],
   );
 
   const handleCopy = useCallback(() => {
